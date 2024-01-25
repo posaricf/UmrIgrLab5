@@ -232,8 +232,16 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IOnEvent
          * je prikazan na ekranu igraca (Linija kôda koja slijedi).
          */
 
+        if (!_photonView.IsMine)
+        {
+            return;
+        }
+
         _health -= damage;
-        _healthBar.GetComponent<Image>().fillAmount = (_health / _maxHealth);
+        if (_healthBar != null)
+        {
+            _healthBar.GetComponent<Image>().fillAmount = (_health / _maxHealth);
+        }
         /*
          * Nakon toga potrebno je provjeriti da li je igracevo zdravlje ispod nule.
          * Ako je ispod nule, to znaci da je igrac unisten i potrebno je azurirati scoreboard
@@ -247,7 +255,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IDamageable, IOnEvent
          */
         if (_health <= 0)
         {
-            _photonView.RPC("RPC_KillScoreboard", shooter, shooter);
+            _photonView.RPC("RPC_KillScoreboard", RpcTarget.All, shooter);
             Die();
         }
     }
